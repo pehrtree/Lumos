@@ -25,6 +25,7 @@ class DMXSource(object):
     def __init__(self, universe=1, network_segment=1, bind_ip=None):
         self.universe = universe
         self.ip = ip_from_universe(universe)
+        self.seq = 0
         # open UDP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         if bind_ip:
@@ -35,5 +36,6 @@ class DMXSource(object):
         self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 
     def send_data(self, data):
-        packet = E131Packet(universe=self.universe, data=data)
+        self.seq = (self.seq+1)&0xFF
+        packet = E131Packet(universe=self.universe, data=data,sequence=self.seq)
         self.sock.sendto(packet.packet_data, (self.ip, 5568))

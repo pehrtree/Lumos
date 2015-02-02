@@ -22,10 +22,11 @@ class DMXSource(object):
     bind_ip is the IP address assigned to a specific HW interface
     """
 
-    def __init__(self, universe=1, network_segment=1, bind_ip=None):
+    def __init__(self, universe=1, network_segment=1, bind_ip=None, name=None):
         self.universe = universe
         self.ip = ip_from_universe(universe)
         self.seq = 0
+        self.name = name
         # open UDP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         if bind_ip:
@@ -37,5 +38,5 @@ class DMXSource(object):
 
     def send_data(self, data):
         self.seq = (self.seq+1)&0xFF
-        packet = E131Packet(universe=self.universe, data=data,sequence=self.seq)
+        packet = E131Packet(universe=self.universe, data=data,sequence=self.seq,name=self.name)
         self.sock.sendto(packet.packet_data, (self.ip, 5568))
